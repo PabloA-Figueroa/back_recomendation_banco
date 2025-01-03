@@ -45,6 +45,7 @@ langsmith==0.2.7
 marshmallow==3.23.2
 multidict==6.1.0
 mypy-extensions==1.0.0
+mysql-connector-python==9.1.0
 numpy==1.26.4
 openai==1.58.1
 orjson==3.10.13

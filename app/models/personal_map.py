@@ -1,3 +1,4 @@
+from datetime import date
 from typing import List, Optional
 from pydantic import BaseModel
 
@@ -9,7 +10,26 @@ class AcademicInfo(BaseModel):
     nivel_de_estudio_ponderacion: int = None
     estado_de_estudio: Optional[str] = None
     estado_de_estudio_ponderacion: int = None
-
+class PersonalInfo(BaseModel):
+    class Config:
+        from_attributes = True  # Enables ORM mode
+        json_encoders = {
+            date: lambda v: v.strftime("%Y-%m-%d")
+        }
+    id: int
+    nombre_completo: str
+    numero_cedula: str
+    telefono: str
+    correo: str
+    linkedin: Optional[str] = None
+    estado_civil: Optional[str] = None
+    fecha_nacimiento: date
+    edad: int
+    aspiracion_salarial: float
+    tipo_sangre: Optional[str] = None
+    direccion: Optional[str] = None
+    personal_map_document: Optional[str] = None
+    profile_model_id: int
 class LanguageSkill(BaseModel):
     idioma: Optional[str] = None
     idioma_ponderacion: int = None
@@ -56,3 +76,8 @@ class ProfileData(BaseModel):
 # Modelo principal
 class ProfileModel(BaseModel):
     personal_map_data: Optional[ProfileData] = None
+
+class ProfileModelTags(BaseModel):
+    id: int
+    tag: str
+    profile_model_id: int

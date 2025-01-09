@@ -2,20 +2,54 @@ from datetime import date
 from typing import List, Optional
 from pydantic import BaseModel
 
-# Modelo de Datos Pydantic con Ponderaciones
+# Modelos Relacionados
 class AcademicInfo(BaseModel):
     area_de_estudio: Optional[str] = None
-    area_de_estudio_ponderacion: int = None
+    area_de_estudio_ponderacion: Optional[int] = None
     nivel_de_estudio: Optional[str] = None
-    nivel_de_estudio_ponderacion: int = None
+    nivel_de_estudio_ponderacion: Optional[int] = None
     estado_de_estudio: Optional[str] = None
-    estado_de_estudio_ponderacion: int = None
+    estado_de_estudio_ponderacion: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+class LanguageSkill(BaseModel):
+    idioma: Optional[str] = None
+    idioma_ponderacion: Optional[int] = None
+    nivel_escritura: Optional[str] = None
+    nivel_escritura_ponderacion: Optional[int] = None
+    nivel_habla: Optional[str] = None
+    nivel_habla_ponderacion: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+
+class WorkExperience(BaseModel):
+    nombre_del_puesto: Optional[str] = None
+    jerarquia: Optional[str] = None
+    # Agrega otros campos según corresponda
+
+    class Config:
+        orm_mode = True
+
+class Skills(BaseModel):
+    habilidades_blandas: Optional[str] = None
+    habilidades_tecnicas: Optional[str] = None
+    habilidades_blandas_ponderacion: Optional[int] = None
+    habilidades_tecnicas_ponderacion: Optional[int] = None
+
+    class Config:
+        orm_mode = True
+# Modelo de Datos Pydantic con Ponderaciones
 class PersonalInfo(BaseModel):
     class Config:
         from_attributes = True  # Enables ORM mode
+        orm_mode = True
         json_encoders = {
             date: lambda v: v.strftime("%Y-%m-%d")
         }
+    
     id: int
     nombre_completo: str
     numero_cedula: str
@@ -29,55 +63,45 @@ class PersonalInfo(BaseModel):
     tipo_sangre: Optional[str] = None
     direccion: Optional[str] = None
     personal_map_document: Optional[str] = None
-    profile_model_id: int
-class LanguageSkill(BaseModel):
-    idioma: Optional[str] = None
-    idioma_ponderacion: int = None
-    nivel_escritura: Optional[str] = None
-    nivel_escritura_ponderacion: int = None
-    nivel_habla: Optional[str] = None
-    nivel_habla_ponderacion: int = None
-
-class WorkExperience(BaseModel):
-    nombre_del_puesto: Optional[str] = None
-    nombre_del_puesto_ponderacion: int = None
-    jerarquia: Optional[str] = None
-    jerarquia_ponderacion: int = None
-    nombre_de_la_empresa: Optional[str] = None
-    nombre_de_la_empresa_ponderacion: int = None
-    ubicacion_de_la_empresa: Optional[str] = None
-    ubicacion_de_la_empresa_ponderacion: int = None
-    tipo_de_empresa: Optional[str] = None
-    tipo_de_empresa_ponderacion: int = None
-    area_de_trabajo: Optional[str] = None
-    area_de_trabajo_ponderacion: int = None
-    actualmente_trabajo_aqui: Optional[str] = None
-    actualmente_trabajo_aqui_ponderacion: int = None
-    tiempo_de_trabajo: Optional[str] = None
-    tiempo_de_trabajo_ponderacion: int = None
-
-
-class Skills(BaseModel):
-    habilidades_blandas: Optional[List[dict]] = None
-    habilidades_tecnicas: Optional[List[dict]] = None
-    habilidades_blandas_ponderacion: int = None
-    habilidades_tecnicas_ponderacion: int = None
+    profile_data_id: int
 
 class ProfileData(BaseModel):
+    id: Optional[int] = None
     informacion_academica: Optional[AcademicInfo] = None
-    informacion_academica_ponderacion: int = None
+    informacion_academica_ponderacion: Optional[int] = None
     idioma: Optional[LanguageSkill] = None
-    idioma_ponderacion: int = None
+    idioma_ponderacion: Optional[int] = None
     experiencia_laboral:  Optional[WorkExperience] = None
-    experiencia_laboral_ponderacion: int = None
+    experiencia_laboral_ponderacion: Optional[int] = None
     habilidades: Optional[Skills] = None
-    habilidades_ponderacion: int = None
+    habilidades_ponderacion: Optional[int] = None
+    personal_info: Optional[PersonalInfo] = None
+    tags: List["ProfileModelTags"] = []
 
-# Modelo principal
-class ProfileModel(BaseModel):
-    personal_map_data: Optional[ProfileData] = None
+    class Config:
+        from_attributes = True
+        orm_mode = True
+
 
 class ProfileModelTags(BaseModel):
     id: int
     tag: str
-    profile_model_id: int
+    profile_data_id: int
+
+    class Config:
+        orm_mode = True
+
+# Modelo principal
+class ProfileModel(BaseModel):
+    personal_map_data: ProfileData
+
+    class Config:
+        orm_mode = True
+    @classmethod
+    def from_orm(cls, orm_object):
+        """Convierte un objeto ORM de ProfileModel a un objeto Pydantic ProfileModel."""
+        # Primero, convierte la información básica de ProfileModel
+        profile_model_data = {
+            "personal_map_data": ProfileData.from_orm(orm_object) if orm_object else None
+        }
+        return cls(**profile_model_data)

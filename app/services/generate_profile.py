@@ -32,10 +32,10 @@ def generate_ideal_profile(job_description: str) -> dict:
     )
     format_instructions = output_parser.get_format_instructions()
     chain = prompt | model
-    result = chain.invoke({"job_description": job_description,  "format_instructions": format_instructions})
-    return result.model_dump()
+    result = chain.invoke({"job_description": job_description,  "format_instructions": format_instructions}).content.strip()
+    return result
 
-def ejecutar():
+def generar():
     job_description = "Desarrollador de Software con experiencia en Python y Django, con conocimientos de bases de datos y desarrollo front-end. Se requiere alta capacidad para trabajar en equipo y buenas habilidades de comunicación."
     ideal_profile = generate_ideal_profile(job_description)
     return ideal_profile

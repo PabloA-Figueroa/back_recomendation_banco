@@ -3,6 +3,23 @@ from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
 
+class ProfileDataORM(Base):
+    __tablename__ = "profile_data"
+
+    id = Column(Integer, primary_key=True, index=True)
+    informacion_academica_ponderacion = Column(Integer, nullable=False)
+    idioma_ponderacion = Column(Integer, nullable=False)
+    experiencia_laboral_ponderacion = Column(Integer, nullable=False)
+    habilidades_ponderacion = Column(Integer, nullable=False)
+
+    # Relaciones con otras tablas
+    personal_info = relationship("PersonalInfoORM", back_populates="profile_data", uselist=False, cascade="all, delete-orphan")
+    informacion_academica = relationship("AcademicInfoORM", back_populates="profile_data", uselist=False, cascade="all, delete-orphan")
+    idioma = relationship("LanguageSkillORM", back_populates="profile_data", uselist=False, cascade="all, delete-orphan")
+    experiencia_laboral = relationship("WorkExperienceORM", back_populates="profile_data", uselist=False, cascade="all, delete-orphan")
+    habilidades = relationship("SkillsORM", back_populates="profile_data", uselist=False, cascade="all, delete-orphan")
+    tags = relationship("ProfileModelTagsORM", back_populates="profile_data", cascade="all, delete-orphan")
+
 class PersonalInfoORM(Base):
     __tablename__ = "personal_info"
 
@@ -19,11 +36,9 @@ class PersonalInfoORM(Base):
     tipo_sangre = Column(String(10), nullable=True)
     direccion = Column(String(255), nullable=True)
     personal_map_document = Column(String(255), nullable=True)
-    profile_model_id = Column(Integer, ForeignKey('profile_model.id'), nullable=False)
-    profile_model = relationship(
-        "ProfileModelORM",
-        back_populates="personal_info"  
-    )
+
+    profile_data_id = Column(Integer, ForeignKey('profile_data.id'), nullable=False)
+    profile_data = relationship("ProfileDataORM", back_populates="personal_info")
 
 class AcademicInfoORM(Base):
     __tablename__ = "academic_info"
@@ -87,41 +102,6 @@ class SkillsORM(Base):
 
     profile_data_id = Column(Integer, ForeignKey('profile_data.id'), nullable=False)
     profile_data = relationship("ProfileDataORM", back_populates="habilidades")
-class ProfileDataORM(Base):
-    __tablename__ = "profile_data"
-
-    id = Column(Integer, primary_key=True, index=True)
-    informacion_academica_ponderacion = Column(Integer, nullable=False)
-    idioma_ponderacion = Column(Integer, nullable=False)
-    experiencia_laboral_ponderacion = Column(Integer, nullable=False)
-    habilidades_ponderacion = Column(Integer, nullable=False)
-
-    # Relación con ProfileModelORM
-    personal_map_id = Column(Integer, ForeignKey('profile_model.id'), nullable=False)
-    personal_map = relationship(
-            "ProfileModelORM",
-            back_populates="personal_map_data",
-            foreign_keys=[personal_map_id]
-        )
-    # Relaciones con otras tablas
-    informacion_academica = relationship("AcademicInfoORM", back_populates="profile_data", uselist=False)
-    idioma = relationship("LanguageSkillORM", back_populates="profile_data", uselist=False)
-    experiencia_laboral = relationship("WorkExperienceORM", back_populates="profile_data", uselist=False)
-    habilidades = relationship("SkillsORM", back_populates="profile_data", uselist=False)
-
-class ProfileModelORM(Base):
-    __tablename__ = "profile_model"
-
-    id = Column(Integer, primary_key=True, index=True)
-    personal_map_data_id = Column(Integer, ForeignKey('profile_data.id'), nullable=False)
-    personal_map_data = relationship(
-        "ProfileDataORM",
-        back_populates="personal_map",
-        foreign_keys=[ProfileDataORM.personal_map_id]
-    )
-
-    personal_info = relationship("PersonalInfoORM", back_populates="profile_model", uselist=False)
-    tags = relationship("ProfileModelTagsORM", back_populates="profile_model")
 
 class ProfileModelTagsORM(Base):
     __tablename__ = "profile_model_tags"
@@ -129,5 +109,5 @@ class ProfileModelTagsORM(Base):
     id = Column(Integer, primary_key=True, index=True)
     tag = Column(String(50), nullable=False)
 
-    profile_model_id = Column(Integer, ForeignKey('profile_model.id'), nullable=False)
-    profile_model = relationship("ProfileModelORM", back_populates="tags")
+    profile_data_id = Column(Integer, ForeignKey('profile_data.id'), nullable=False)
+    profile_data = relationship("ProfileDataORM", back_populates="tags")

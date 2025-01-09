@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 from typing import List
 from fastapi import  APIRouter, HTTPException
 from app.models.personal_map import ProfileData
-from app.services.recomendacion import generate_recomendation
 from data.database.mysql import MySqlConnection
 from fastapi.responses import FileResponse
 import os
+
 router = APIRouter()
 
 @router.get("/get/personal_maps")
@@ -20,26 +20,18 @@ async def get_personal_maps():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.get("/get/personal_maps/completos", response_model=List[ProfileData])
+@router.get("/get/personal_map/completos", response_model=List[ProfileData])
 async def get_profile_data():
     try:
         db = MySqlConnection()
-        profile_data = db.get_all_ideal_personal_maps()
+        profile_data = db.get_all_personal_maps()
         return profile_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
 
-@router.get("/get/candidates")
-async def get_candidates():
-    try:
-        db = MySqlConnection()
-        candidates = db.get_all_candidates()
-        return {
-            "status": "200",
-            "data": candidates
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+
 
 @router.get("/pdf", name="Obtener PDFs")
 async def get_file():
@@ -54,16 +46,3 @@ async def get_file():
         raise HTTPException(status_code=404, detail="Archivo no encontrado en el sistema de archivos")
     # Retornar el archivo PDF
     return FileResponse(path=full_file_path, filename=os.path.basename(full_file_path), media_type='application/pdf')
-
-
-
-@router.get("/get/recomendation")
-async def get_candidates():
-    try:
-        recomendacion = generate_recomendation()
-        return {
-            "status": "200",
-            "data": recomendacion
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))

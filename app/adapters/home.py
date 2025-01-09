@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 from typing import List
 from fastapi import  APIRouter, HTTPException
 from app.models.personal_map import ProfileData
 from data.database.mysql import MySqlConnection
 from fastapi.responses import FileResponse
 import os
+
 router = APIRouter()
 
 @router.get("/get/personal_maps")

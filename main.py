@@ -3,7 +3,6 @@ from app.adapters import personal_map, home
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
-
 # Configura CORS
 app.add_middleware(
     CORSMiddleware,

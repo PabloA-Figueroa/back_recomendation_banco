@@ -1,20 +1,11 @@
 # -*- coding: utf-8 -*-
-import json
 import os
 from http.client import HTTPException
 from fastapi import  APIRouter, Depends, UploadFile,File
-from app.models.personal_map import  ProfileModel
-from app.models.personal_map_mongo import ProfileData, ProfileDataActualizado
 from app.services.Extract_pdfs import extract_pdf
-from app.services.generate_profile import  generar
 from data.database.mongodb import MongoConnection
-
-from bson import ObjectId
-
 from pymongo import MongoClient
-
 from typing import List
-
 from fastapi.responses import JSONResponse
 
 PDF_STORAGE_DIR = r"C:\Users\salas\back_recomendation_banco\data\pdfs"
@@ -118,75 +109,3 @@ async def save_pdf_data():
         raise HTTPException(status_code=500, detail=f"Error al guardar los datos: {e}")
 
 
-@router.post("/create_profile/")
-async def create_profile(profile: ProfileModel):
-    # Aquí puedes procesar el objeto 'profile', como guardarlo en una base de datos
-    print(profile)
-    return {"message": "Perfil creado con éxito", "profile_data": profile}
-
-
-
-@router.get("/generate_profile")
-async def generate_profile():
-    response = generar()
-    conecction = MongoConnection()
-    try:
-        # Guardar los datos en MongoDB
-        inserted_id = conecction.save_to_mongodb_ideal_personal_map(response, "ideal_profile")
-        print(f"Datos insertados correctamente con ID: {inserted_id}")
-        return {
-            "status": 200,
-            "message": "Datos insertados correctamente",
-            "inserted_id": str(inserted_id)
-        }
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})
-
-# TEST ------------------------ 
-
-
-@router.post("/profile/update", response_model=ProfileDataActualizado)
-async def update_profile(data: ProfileDataActualizado):
-    coneccion = MongoConnection()
-    try:
-        # Guardar los datos en MongoDB
-        inserted_id = coneccion.save_to_mongodb_ideal_personal_map(data, "personal_map")
-        #inserted_id = save_to_mongo    "_id": "64f1a2b3c1b2c3d4e5f6a7b9",db(data)
-        print(f"Datos insertados correctamente con ID: {inserted_id}")
-        data.id = inserted_id
-        print("data",data)
-        print(data.id)
-        return {
-            "status": 200,
-            "message": "Datos insertados correctamente",
-        }
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})
-    
-@router.get("/ideal_profile/get")
-async def get_ideal_profile():
-    conecction = MongoConnection()
-    try:
-        # Obtener el perfil ideal de MongoDB
-        ideal_profile = conecction.get_ideal_model()
-        return {
-            "status": 200,
-            "message": "Perfil ideal obtenido correctamente",
-            "data": ideal_profile
-        }
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})
-    
-@router.get("/ideal_profiles/get")
-async def get_ideal_profiles():
-    conecction = MongoConnection()
-    try:
-        # Obtener todos los perfiles ideales de MongoDB
-        ideal_profiles = conecction.get_all_ideal_models()
-        return {
-            "status": 200,
-            "message": "Perfiles ideales obtenidos correctamente",
-            "data": ideal_profiles
-        }
-    except Exception as e:
-        return JSONResponse(status_code=500, content={"detail": str(e)})

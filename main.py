@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.adapters import personal_map, home
+from app.adapters import personal_map, home, ideal_profile
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -13,3 +13,4 @@ app.add_middleware(
 )
 app.include_router(personal_map.router, tags=["Personal Map"], prefix="/personal_map")
 app.include_router(home.router, tags=["Home"], prefix="/home")
+app.include_router(ideal_profile.router, tags=["Ideal Model"], prefix="/ideal_profile")

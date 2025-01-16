@@ -45,7 +45,7 @@ async def extract_and_save_multiple_pdfs(files: List[UploadFile] = File(...)):
             extracted_data = extract_pdf(file_path)
 
             # Save extracted data to MongoDB
-            saved_data = conecction.self.collection.insert_one({
+            saved_data = conecction.collection.insert_one({
                 "filename": file.filename,
                 "data": extracted_data
             })

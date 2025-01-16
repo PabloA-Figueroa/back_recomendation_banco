@@ -6,8 +6,8 @@ from fastapi import  APIRouter, Depends, UploadFile,File
 from app.models.personal_map import  ProfileModel
 from app.models.personal_map_mongo import ProfileData, ProfileDataActualizado
 from app.services.Extract_pdfs import extract_pdf
-from app.services.generate_profile import ejecutar, generar
-from app.services.mongodb import MongoConnection, save_to_mongodb
+from app.services.generate_profile import  generar
+from data.database.mongodb import MongoConnection
 
 from bson import ObjectId
 
@@ -91,6 +91,7 @@ async def extract_and_save_multiple_pdfs(files: List[UploadFile] = File(...)):
 
 @router.post("/save_pdf_data")
 async def save_pdf_data():
+    connection = MongoConnection()
     ruta_pdf = r"C:\Users\salas\back_recomendation_banco\data\pdfs\personal_map.pdf"
     
     if not os.path.exists(ruta_pdf):
@@ -101,7 +102,7 @@ async def save_pdf_data():
         data = extract_pdf(ruta_pdf)
         
         # Guardar datos en MongoDB
-        result = save_to_mongodb(data)
+        result = connection.save_to_mongodb(data)
         
         # Convertir ObjectId a string antes de devolver la respuesta
         response_data = {

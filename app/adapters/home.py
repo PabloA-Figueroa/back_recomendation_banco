@@ -31,8 +31,6 @@ async def get_profile_data():
     
 
 
-
-
 @router.get("/pdf", name="Obtener PDFs")
 async def get_file():
     file_path = "/home/pablof/Documentos/study/data/pdfs/1._Plan_docente_test.pdf"

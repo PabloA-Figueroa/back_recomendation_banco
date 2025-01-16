@@ -2,9 +2,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import JSONResponse
 from PyPDF2 import PdfReader
 import os
-
-from app.services.mongodb import MongoConnection
-
+from typing import List
 
 router = FastAPI()
 # Ruta fija donde se almacenará el archivo subido
@@ -74,26 +72,3 @@ def extract_pdf(file_path: str):
         print(f"Error al procesar el PDF: {e}")
         raise HTTPException(status_code=500, detail="Error procesando el PDF")
     
-
-@router.post("/upload-pdf/")
-async def upload_pdf(file: UploadFile = File(...)):
-    connection = MongoConnection()
-    """Endpoint para subir y procesar un PDF."""
-    try:
-        # Guardar el archivo subido en el sistema
-        with open(PDF_STORAGE_PATH, "wb") as f:
-            f.write(await file.read())
-
-        # Extraer los datos del PDF
-        extracted_data = extract_pdf(PDF_STORAGE_PATH)
-
-        # Guardar los datos en MongoDB
-        connection.save_to_mongodb(extracted_data)
-
-        return JSONResponse(
-            content={"message": "PDF procesado y datos guardados correctamente.", "data": extracted_data},
-            status_code=200,
-        )
-    except Exception as e:
-        print(f"Error procesando el PDF: {e}")
-        raise HTTPException(status_code=500, detail="Error procesando el archivo")

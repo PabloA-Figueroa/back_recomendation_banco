@@ -1,5 +1,7 @@
 from datetime import date
+import json
 from typing import List, Optional
+from bson import ObjectId
 from pydantic import BaseModel
 
 # Modelos Relacionados
@@ -78,6 +80,16 @@ class ProfileData(BaseModel):
     personal_info: Optional[PersonalInfo] = None
     tags: List["ProfileModelTags"] = []
 
+class ProfileDataActualizado(BaseModel):
+    id: Optional[int] = None
+    informacion_academica: Optional[AcademicInfo] = None
+    informacion_academica_ponderacion: Optional[int] = None
+    experiencia_laboral:  Optional[WorkExperience] = None
+    experiencia_laboral_ponderacion: Optional[int] = None
+    habilidades: Optional[Skills] = None
+    habilidades_ponderacion: Optional[int] = None
+    personal_info: Optional[PersonalInfo] = None
+    tags: List["ProfileModelTags"] = []
     class Config:
         from_attributes = True
         orm_mode = True
@@ -102,6 +114,7 @@ class ProfileModel(BaseModel):
         """Convierte un objeto ORM de ProfileModel a un objeto Pydantic ProfileModel."""
         # Primero, convierte la información básica de ProfileModel
         profile_model_data = {
-            "personal_map_data": ProfileData.from_orm(orm_object) if orm_object else None
+            "personal_map_data": ProfileDataActualizado.from_orm(orm_object) if orm_object else None
         }
         return cls(**profile_model_data)
+

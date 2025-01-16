@@ -23,10 +23,8 @@ def assign_weights_to_candidate(ideal_profile: Dict, candidate: Dict) -> Dict:
     """
     Asigna pesos a las características de un candidato en función del perfil ideal.
     """
-    # Configuración del JsonOutputParser
     parser = JsonOutputParser(pydantic_object=ProfileModel)
     
-    # Definición del prompt
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", """
@@ -104,10 +102,8 @@ def generate_recomendation():
     candidates = db.get_all_candidates()
     print("Candidatos obtenidos de la base de datos: ", candidates)
     
-    # Comparar y seleccionar los 5 mejores candidatos
     top_5_candidates = compare_candidates(ideal_profile, candidates)
     
-    # Imprimir los 5 mejores candidatos
     print("Recomendación final:")
     for candidate in top_5_candidates:
         print(candidate)

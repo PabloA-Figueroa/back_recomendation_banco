@@ -1,0 +1,62 @@
+{
+    "personal_map_data": {
+    "id": null,
+    "informacion_academica": {
+        "area_de_estudio": "Ingeniería en Sistemas Computacionales o similar",
+        "area_de_estudio_ponderacion": 80,
+        "nivel_de_estudio": "Universitario",
+        "nivel_de_estudio_ponderacion": 80,
+        "estado_de_estudio": "Graduado",
+        "estado_de_estudio_ponderacion": 70
+    },
+    "informacion_academica_ponderacion": 75,
+    "idioma": [
+        {
+        "idioma": "Español",
+        "idioma_ponderacion": 100,
+        "nivel_escritura": "Nativo",
+        "nivel_escritura_ponderacion": 100,
+        "nivel_habla": "Nativo",
+        "nivel_habla_ponderacion": 100
+        },
+        {
+        "idioma": "Inglés",
+        "idioma_ponderacion": 90,
+        "nivel_escritura": "Intermedio-Alto",
+        "nivel_escritura_ponderacion": 90,
+        "nivel_habla": "Intermedio-Alto",
+        "nivel_habla_ponderacion": 90
+        }
+    ],
+    "idioma_ponderacion": 85,
+    "experiencia_laboral": {
+        "nombre_del_puesto": "Desarrollador de Software",
+        "jerarquia": "Junior/Mid-level"
+    },
+    "experiencia_laboral_ponderacion": 80,
+    "habilidades": {
+        "habilidades_blandas": "Trabajo en equipo, Comunicación efectiva, Proactividad, Resolución de problemas, Adaptabilidad",
+        "habilidades_tecnicas": "Python, Django, SQL, HTML, CSS, JavaScript, Git, Metodologías ágiles (Scrum, Kanban)",
+        "habilidades_blandas_ponderacion": 90,
+        "habilidades_tecnicas_ponderacion": 95
+    },
+    "habilidades_ponderacion": 92,
+    "personal_info": {
+        "id": 1,
+        "nombre_completo": null,
+        "numero_cedula": null,
+        "telefono": null,
+        "correo": null,
+        "linkedin": null,
+        "estado_civil": null,
+        "fecha_nacimiento": null,
+        "edad": null,
+        "aspiracion_salarial": null,
+        "tipo_sangre": null,
+        "direccion": null,
+        "personal_map_document": null,
+        "profile_data_id": null
+    },
+    "tags": []
+    }
+}

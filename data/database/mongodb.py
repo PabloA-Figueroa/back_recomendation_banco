@@ -18,17 +18,8 @@ class MongoConnection:
             print("Conexión exitosa a MongoDB", self.collection)
         except ServerSelectionTimeoutError as e:
             print(f"Error de conexión a MongoDB: {e}")
-    def save_to_mongodb(self,data: Dict):
-        """
-        Guarda los datos extraídos del PDF en la base de datos MongoDB.
-        """
-        try:
-            print(f"Guardando los siguientes datos en MongoDB: {data}")
-            result = self.collection.insert_one(data)
-            print(f"Documento insertado con ID: {result.inserted_id}")
-            print("Datos guardados correctamente en MongoDB")
-        except Exception as e:
-            print(f"Error al guardar en MongoDB: {e}")
+
+            
     def save_to_mongodb_personal_map(self, data: Dict, collection_name):
         try:
             print(f"Guardando los siguientes datos en MongoDB: {data}")

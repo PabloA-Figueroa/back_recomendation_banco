@@ -10,15 +10,6 @@ from fastapi.responses import JSONResponse
 
 PDF_STORAGE_DIR = r"C:\Users\salas\back_recomendation_banco\data\pdfs"
 
-# MongoDB Configuration
-MONGO_URI = "mongodb://localhost:27017"
-DATABASE_NAME = "pdf_data"
-COLLECTION_NAME = "extracted_info"
-
-# Initialize MongoDB Client
-client = MongoClient(MONGO_URI)
-db = client[DATABASE_NAME]
-collection = db[COLLECTION_NAME]
 
 router = APIRouter()
 
@@ -35,6 +26,7 @@ async def extracts_pdf():
 
 @router.post("/extract_and_save_multiple_pdfs")
 async def extract_and_save_multiple_pdfs(files: List[UploadFile] = File(...)):
+    conecction = MongoConnection()
     """Endpoint to upload and process multiple PDFs."""
     if not os.path.exists(PDF_STORAGE_DIR):
         os.makedirs(PDF_STORAGE_DIR)
@@ -53,7 +45,7 @@ async def extract_and_save_multiple_pdfs(files: List[UploadFile] = File(...)):
             extracted_data = extract_pdf(file_path)
 
             # Save extracted data to MongoDB
-            saved_data = collection.insert_one({
+            saved_data = conecction.self.collection.insert_one({
                 "filename": file.filename,
                 "data": extracted_data
             })

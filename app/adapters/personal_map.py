@@ -72,32 +72,5 @@ async def extract_and_save_multiple_pdfs(files: List[UploadFile] = File(...)):
     )
 
 
-@router.post("/save_pdf_data")
-async def save_pdf_data():
-    connection = MongoConnection()
-    ruta_pdf = r"C:\Users\salas\back_recomendation_banco\data\pdfs\personal_map.pdf"
-    
-    if not os.path.exists(ruta_pdf):
-        raise HTTPException(status_code=404, detail="Archivo no encontrado")
-    
-    try:
-        # Extraer datos del PDF
-        data = extract_pdf(ruta_pdf)
-        
-        # Guardar datos en MongoDB
-        result = connection.save_to_mongodb(data)
-        
-        # Convertir ObjectId a string antes de devolver la respuesta
-        response_data = {
-            "status": 200,
-            "message": "Datos guardados en MongoDB exitosamente",
-            "data": data,
-            "inserted_id": str(result.inserted_id)  # Convertimos ObjectId a string
-        }
-        
-        return response_data
-    
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al guardar los datos: {e}")
 
 

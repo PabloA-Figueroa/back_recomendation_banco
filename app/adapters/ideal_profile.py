@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 from app.models.personal_map import ProfileDataActualizado
+from app.models.personal_map_mongos import ProfileModel
 from app.services.generate_profile import generar
 from data.database.mongodb import MongoConnection
 router = APIRouter()
@@ -22,8 +23,8 @@ async def generate_profile():
     except Exception as e:
         return JSONResponse(status_code=500, content={"detail": str(e)})
 
-@router.post("/profile/update", response_model=ProfileDataActualizado)
-async def update_profile(data: ProfileDataActualizado):
+@router.post("/profile/update", response_model=ProfileModel)
+async def update_profile(data: ProfileModel):
     coneccion = MongoConnection()
     try:
         # Guardar los datos en MongoDB

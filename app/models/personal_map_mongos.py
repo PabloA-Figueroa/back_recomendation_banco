@@ -43,7 +43,13 @@ class Seccion(BaseModel):
     name: Optional[str] = None
     Subsecciones: List[Subseccion]
     ponderacion: int
-
+# Clase para manejar la información familiar
+class Familiar(BaseModel):
+    parentesco: str = ""
+    nombre: str = ""
+    edad: int = 0
+    profesion: str = ""
+    telefono: str = ""
 # Clase para manejar la información personal
 class PersonalInfo(BaseModel):
     model_config = ConfigDict(
@@ -62,7 +68,12 @@ class PersonalInfo(BaseModel):
     tipo_sangre: Optional[str] = None
     direccion: Optional[str] = None
     personal_map_document: Optional[str] = None
+ # Información de discapacidad
+    tipo_descapacidad: Optional[str] = None
+    porcentaje_descapacidad: Optional[float] = None
 
+    # Información Familiar
+    familiares: List[Familiar] = []
 # Clase principal que representa el modelo completo
 class ProfileModel(BaseModel):
     model_config = ConfigDict(
@@ -72,6 +83,46 @@ class ProfileModel(BaseModel):
     Secciones: List[Seccion]
     Tag: Optional[str] = None
     #personal_info: Optional[PersonalInfo] = None
+
+    @classmethod
+    def from_mongo(cls, data: dict):
+        """Convierte un documento MongoDB a un objeto Pydantic ProfileModel."""
+        if data:
+            # Convertir las secciones
+            secciones = []
+            for seccion_data in data.get("Secciones", []):
+                subsecciones = []
+                for subseccion_data in seccion_data.get("Subsecciones", []):
+                    values = [Value(**value) for value in subseccion_data.get("values", [])]
+                    subseccion = Subseccion(
+                        nombre=subseccion_data.get("nombre", ""),
+                        values=values,
+                        ponderacion=subseccion_data.get("ponderacion", 0)
+                    )
+                    subsecciones.append(subseccion)
+                seccion = Seccion(
+                    Subsecciones=subsecciones,
+                    ponderacion=seccion_data.get("ponderacion", 0)
+                )
+                secciones.append(seccion)
+
+            # Obtener el tag y la información personal
+            tag = data.get("Tag")
+            personal_info_data = data.get("personal_info", {})
+            personal_info = PersonalInfo(**personal_info_data) if personal_info_data else None
+
+            return cls(Secciones=secciones, Tag=tag, personal_info=personal_info)
+        return None
+    
+
+class ProfileModelFromPersonalMap(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders={ObjectId: str},  # Serializar ObjectId a str
+    )
+    Secciones: List[Seccion]
+    Tag: Optional[str] = None
+    personal_info: Optional[PersonalInfo] = None
 
     @classmethod
     def from_mongo(cls, data: dict):

@@ -78,3 +78,27 @@ class MongoConnection:
         except Exception as e:
             print(f"Error al obtener el perfil ideal: {e}")
             raise
+
+    def get_personal_info(self):
+        try:
+            personal_info = self.db["extracted_fields"].find_one({}, {"_id": 0, "personal_info": 1})
+            print("Personal Info: ", personal_info)
+            return personal_info
+        except Exception as e:
+            print(f"Error al obtener la información personal: {e}")
+            raise
+    def get_all_personal_info(self):
+        try:
+            # Obtener todos los documentos de la colección "extracted_fields"
+            personal_info_cursor = self.db["extracted_fields"].find({}, {"_id": 0, "personal_info": 1})
+            
+            # Convertir el cursor a una lista de documentos
+            personal_info_list = list(personal_info_cursor)
+            
+            print("Personal Info: ", personal_info_list)
+            return personal_info_list
+        except Exception as e:
+            print(f"Error al obtener la información personal: {e}")
+            raise
+
+    

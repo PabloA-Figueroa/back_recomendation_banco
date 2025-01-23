@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-
+from fastapi.encoders import jsonable_encoder
 from app.models.personal_map import ProfileDataActualizado
 from app.models.personal_map_mongos import ProfileModel
 from app.services.generate_profile import generar
@@ -8,13 +8,14 @@ from data.database.mongodb import MongoConnection
 router = APIRouter()
 
 @router.get("/generate_profile")
-async def generate_profile():
-    response = generar()
+async def generate_profile(prompt:str):
+    response = generar(prompt)
     conecction = MongoConnection()
     try:
         # Guardar los datos en MongoDB
         inserted_id = conecction.save_to_mongodb_ideal_personal_map(response, "ideal_profile")
         print(f"Datos insertados correctamente con ID: {inserted_id}")
+        print(response)
         return {
             "status": 200,
             "message": "Datos insertados correctamente",

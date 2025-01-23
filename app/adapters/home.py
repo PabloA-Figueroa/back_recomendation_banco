@@ -1,17 +1,18 @@
-    # -*- coding: utf-8 -*-
 from typing import List
 from fastapi import  APIRouter, HTTPException
 from app.models.personal_map import ProfileData
-from data.database.mysql import MySqlConnection
+from data.database.mongodb import MongoConnection
 from fastapi.responses import FileResponse
 import os
+
+from data.database.mysql import MySqlConnection
 
 router = APIRouter()
 
 @router.get("/get/personal_maps")
 async def get_personal_maps():
     try:
-        db = MySqlConnection()
+        db = MongoConnection()
         personal_info = db.get_all_personal_info()
         return {
             "status": "200",
@@ -20,6 +21,7 @@ async def get_personal_maps():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
 @router.get("/get/personal_map/completos", response_model=List[ProfileData])
 async def get_profile_data():
     try:

@@ -146,7 +146,8 @@ def generate_ideal_profile(job_description: str) -> dict:
     # Parse the JSON response
     return result
 
-def generar():
-    job_description = "Desarrollador de Software con experiencia en Python y Django, con conocimientos de bases de datos y desarrollo front-end. Se requiere alta capacidad para trabajar en equipo y buenas habilidades de comunicación."
+def generar(promp):
+    job_description =promp
+    #"Desarrollador de Software con experiencia en Python y Django, con conocimientos de bases de datos y desarrollo front-end. Se requiere alta capacidad para trabajar en equipo y buenas habilidades de comunicación."
     ideal_profile = generate_ideal_profile(job_description)
     return ideal_profile

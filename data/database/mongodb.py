@@ -79,6 +79,26 @@ class MongoConnection:
             print(f"Error al obtener el perfil ideal: {e}")
             raise
 
+    def get_tags(self):
+        try:
+            tags_cursor = self.db["ideal_profile"].find({}, {"_id": 0, "Tag": 1})
+            tags = [doc["Tag"] for doc in tags_cursor]
+            print("Tags: ", tags)
+            return tags
+        except Exception as e:
+            print(f"Error al obtener los tags: {e}")
+            raise
+
+    def get_profiles_by_tag(self, tag):
+        try:
+            profiles_cursor = self.db["ideal_profile"].find({"Tag": tag}, {"_id": 0})
+            profiles = list(profiles_cursor)
+            print(f"Perfiles con Tag '{tag}': ", profiles)
+            return profiles
+        except Exception as e:
+            print(f"Error al obtener perfiles con tag '{tag}': {e}")
+            raise
+
     def get_personal_info(self):
         try:
             personal_info = self.db["extracted_fields"].find_one({}, {"_id": 0, "personal_info": 1})

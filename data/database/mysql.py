@@ -196,3 +196,5 @@ class MySqlConnection:
                 personal_map_document=item.personal_map_document,
                 profile_data_id=item.profile_data_id,
             ) for item in results]
+        
+        

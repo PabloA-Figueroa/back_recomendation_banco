@@ -42,7 +42,7 @@ async def update_profile(data: ProfileModel):
     except Exception as e:
         return JSONResponse(status_code=500, content={"detail": str(e)})
     
-@router.get("/ideal_profile/get")
+@router.get("/profile/get")
 async def get_ideal_profile():
     conecction = MongoConnection()
     try:
@@ -56,7 +56,7 @@ async def get_ideal_profile():
     except Exception as e:
         return JSONResponse(status_code=500, content={"detail": str(e)})
     
-@router.get("/ideal_profiles/get")
+@router.get("/profiles/get")
 async def get_ideal_profiles():
     conecction = MongoConnection()
     try:
@@ -66,6 +66,34 @@ async def get_ideal_profiles():
             "status": 200,
             "message": "Perfiles ideales obtenidos correctamente",
             "data": ideal_profiles
+        }
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"detail": str(e)})
+    
+@router.get("/tags/get")
+async def get_tags():
+    conecction = MongoConnection()
+    try:
+        # Obtener los tags de los perfiles ideales de MongoDB
+        tags = conecction.get_tags()
+        return {
+            "status": 200,
+            "message": "Tags obtenidos correctamente",
+            "data": tags
+        }
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"detail": str(e)})
+    
+@router.get("/profile/tag/{tag}")
+async def get_profiles_by_tag(tag: str):
+    conecction = MongoConnection()
+    try:
+        # Obtener los perfiles ideales con el tag especificado de MongoDB
+        profiles = conecction.get_profiles_by_tag(tag)
+        return {
+            "status": 200,
+            "message": f"Perfiles con tag '{tag}' obtenidos correctamente",
+            "data": profiles
         }
     except Exception as e:
         return JSONResponse(status_code=500, content={"detail": str(e)})

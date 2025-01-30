@@ -34,16 +34,18 @@ def assign_weights_to_candidate(ideal_profile: Dict, candidate: Dict) -> Dict:
         [
             ("system", """
             Eres un experto en recursos humanos y debes asignar pesos a las características de un candidato en función de un perfil ideal.
-            Debes comparar las características del candidato con el perfil ideal y asignar un peso a cada característica del candidato.
+            Debes comparar las características del candidato con el perfil ideal y asignar un peso a cada característica y subcaracteristica del candidato.
             {format_instructions}
-            Debes devolver con el mismo formato de entrada, pero con los pesos asignados a las características del candidato en base a el perfil ideal.            
-            """),
+            Debes devolver con el mismo formato de entrada (JSON), pero con los pesos asignados a las características del candidato en base a el perfil ideal.            
+            Ademas ten en cuenta que algunos candidatos pueden tener ya haber pasado por este proceso y cuentan con un peso asignado a sus características y explicacion (En ese caso no cambies los datos que uya estan).
+             """),
             ("user", """
             Perfil ideal: {ideal_profile}
             Candidato: {candidate}
-            Asigna pesos a las características del candidato en función del perfil ideal.
+            Asigna pesos a las características y subcaracteristicas del candidato en función del perfil ideal.
             Ademas de las ponderaciones, la explicación de por qué se asignó cada peso es importante y deberia ir al final de la respuesta en un campo llamado "explicacion".
-            """),
+            Ademas Agrega un tag con el nombre del tag del perfil ideal. (Si el candidato ya tiene un tag agrega otro con el nombre del tag del perfil ideal)
+             """),
         ]
     )
     print("Prompt template created")
@@ -80,25 +82,16 @@ def compare_candidates(ideal_profile: Dict, candidates: List[Dict]) -> List[Dict
     for i, candidate in enumerate(candidates, 1):
         print(f"\nProcessing candidate {i}/{len(candidates)}")
         weighted_candidate = assign_weights_to_candidate(ideal_profile, candidate)
-        weighted_candidates.append({**candidate, **weighted_candidate})
+        if isinstance(weighted_candidate,dict):
+            weighted_candidates.append({**candidate, **weighted_candidate})
+        else:
+            weighted_candidates.append(candidate)
     
     print("\nCalculating final scores...")
     sorted_candidates = sorted(
         weighted_candidates,
         key=lambda x: sum([
-            x.get('InformacionAcademica', {}).get('AreaEstudio', 0) +
-            x.get('InformacionAcademica', {}).get('NivelEstudio', 0) +
-            x.get('InformacionAcademica', {}).get('FormacionAdicional', 0) +
-            x.get('ExperienciaLaboral', {}).get('AniosExperiencia', 0) +
-            x.get('ExperienciaLaboral', {}).get('AniosLiderandoTransformacionInnovacion', 0) +
-            x.get('ExperienciaLaboral', {}).get('ImplementacionProyectosEstrategicos', 0) +
-            x.get('ConocimientosTecnicos', {}).get('MetodologiasAgiles', 0) +
-            x.get('ConocimientosTecnicos', {}).get('GestionProyectosInnovacion', 0) +
-            x.get('ConocimientosTecnicos', {}).get('HerramientasGestionCambio', 0) +
-            x.get('ConocimientosTecnicos', {}).get('TecnologiasEmergentes', 0) +
-            x.get('Habilidades', {}).get('HabilidadesBlandas', 0) +
-            x.get('Habilidades', {}).get('HabilidadesTecnicas', 0)
-
+             sum([sum(v.get("ponderacion",0) for v in sub.get("values",[]) if sub.get("values") ) for sub in sec.get("Subsecciones",[]) if sec.get("Subsecciones")  ] ) for sec in x.get('Secciones',[]) if x.get("Secciones")
         ]),
         reverse=True
     )
@@ -108,20 +101,48 @@ def compare_candidates(ideal_profile: Dict, candidates: List[Dict]) -> List[Dict
     print("=== Candidate comparison completed ===\n")
     return top_5_candidates
 
+
+def filter_unnecessary_sections(candidates: List[Dict]) -> List[Dict]:
+    for candidate in candidates:
+        secciones = candidate.get("Secciones", [])
+        filtered_secciones = []
+        for seccion in secciones:
+            if seccion.get("ponderacion", 0) > 0 and seccion.get("name"):
+                subsecciones = seccion.get("Subsecciones", [])
+                filtered_subsecciones = []
+                for subseccion in subsecciones:
+                    if subseccion.get("ponderacion", 0) > 0 and subseccion.get("name"):
+                        valores = [
+                            valor for valor in subseccion.get("values", [])
+                            if valor.get("ponderacion", 0) > 0 and valor.get("name")
+                        ]
+                        if valores:
+                            subseccion["values"] = valores
+                            filtered_subsecciones.append(subseccion)
+                if filtered_subsecciones:
+                    seccion["Subsecciones"] = filtered_subsecciones
+                    filtered_secciones.append(seccion)
+        candidate["Secciones"] = filtered_secciones
+    return candidates
+
 def generate_recomendation(ideal_profile) -> List[Dict]:
     print("\n=== Starting recommendation generation ===")
 
     db = MongoConnection()
     candidates = db.get_extracted_fields_without_personal_info()
-    candidates_dicts = [c for c in candidates]  # Conversión a diccionarios
+    candidates_dicts = [c for c in candidates]
     print(f"Retrieved {len(candidates_dicts)} candidates from database")
 
-    top_5_candidates = compare_candidates(ideal_profile, candidates_dicts)  # Pasar diccionarios
+    # Filtrar información innecesaria
+    filtered_candidates = filter_unnecessary_sections(candidates_dicts)
+    print(f"Filtered candidates to {len(filtered_candidates)} after removing unnecessary information")
+
+    top_5_candidates = compare_candidates(ideal_profile, filtered_candidates)
 
     # Actualizar los candidatos en la base de datos
     for candidate in top_5_candidates:
         print(f"Updating candidate with id {candidate.get('_id', 'Unknown')}")
-        db.update_candidate(candidate.get('_id'), candidate)  # Asegura que update_candidate recibe el ID y el objeto completo
+        db.update_candidate(candidate.get('_id'), candidate)
         print(f"Candidate with id {candidate.get('_id', 'Unknown')} updated successfully")
 
     print("\nFinal Recommendations:")

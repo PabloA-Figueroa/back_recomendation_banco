@@ -39,6 +39,7 @@ router = APIRouter()
 
 @router.post("/generate")
 async def get_recommendation(ideal_profile: IdealProfile) :
+    print("\n=== Starting recommendation generation ===")
     try:
         recommendations = generate_recomendation(ideal_profile.dict())
         # Transformar los diccionarios a objetos CandidateResponse

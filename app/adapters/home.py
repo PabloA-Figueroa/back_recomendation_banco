@@ -9,7 +9,7 @@ from data.database.mysql import MySqlConnection
 
 router = APIRouter()
 
-@router.get("/get/personal_maps")
+@router.get("/personal_maps/get")
 async def get_personal_maps():
     try:
         db = MongoConnection()
@@ -22,7 +22,7 @@ async def get_personal_maps():
         raise HTTPException(status_code=500, detail=str(e))
     
 
-@router.get("/get/personal_map/completos", response_model=List[ProfileData])
+@router.get("/personal_map/completos/get", response_model=List[ProfileData])
 async def get_profile_data():
     try:
         db = MySqlConnection()

@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
 from typing import Dict
@@ -38,8 +39,8 @@ class MongoConnection:
         try:
             print(f"Guardando los siguientes datos en MongoDB: {data}")
             data_dict = data.model_dump() if hasattr(data, "model_dump") else data
-
-            # Convertir campos datetime.date a datetime.datetime
+            
+            # Convertir campos datetime.date a datetime.datetime si es necesario
             if "fecha_nacimiento" in data_dict.get("personal_info", {}):
                 fecha_nacimiento = data_dict["personal_info"]["fecha_nacimiento"]
                 if isinstance(fecha_nacimiento, date):
@@ -49,9 +50,13 @@ class MongoConnection:
 
             # Insertar el documento en MongoDB
             result = self.db[collection_name].insert_one(data_dict)
+            
+            # Convertir ObjectId a string si es necesario
+            data_dict["_id"] = str(result.inserted_id)
+            
             print(f"Documento insertado con ID: {result.inserted_id}")
             print("Datos guardados correctamente en MongoDB")
-            return result.inserted_id
+            return str(result.inserted_id)
         except Exception as e:
             print(f"Error al guardar en MongoDB: {e}")
             raise
@@ -120,5 +125,3 @@ class MongoConnection:
         except Exception as e:
             print(f"Error al obtener la información personal: {e}")
             raise
-
-    

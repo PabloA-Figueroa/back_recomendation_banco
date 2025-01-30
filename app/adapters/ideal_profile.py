@@ -13,13 +13,13 @@ async def generate_profile(prompt:str):
     conecction = MongoConnection()
     try:
         # Guardar los datos en MongoDB
-        inserted_id = conecction.save_to_mongodb_ideal_personal_map(response, "ideal_profile")
-        print(f"Datos insertados correctamente con ID: {inserted_id}")
+        conecction.save_to_mongodb_ideal_personal_map(response, "ideal_profile")
+        #print(f"Datos insertados correctamente con ID: {inserted_id}")
         print(response)
         return {
             "status": 200,
             "message": "Datos insertados correctamente",
-            "inserted_id": str(inserted_id)
+            "data": response
         }
     except Exception as e:
         return JSONResponse(status_code=500, content={"detail": str(e)})

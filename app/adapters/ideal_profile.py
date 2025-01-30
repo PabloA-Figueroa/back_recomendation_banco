@@ -24,20 +24,18 @@ async def generate_profile(prompt:str):
     except Exception as e:
         return JSONResponse(status_code=500, content={"detail": str(e)})
 
-@router.post("/profile/update", response_model=ProfileModel)
+@router.post("/profile/update")
 async def update_profile(data: ProfileModel):
     coneccion = MongoConnection()
     try:
         # Guardar los datos en MongoDB
         inserted_id = coneccion.save_to_mongodb_ideal_personal_map(data, "personal_map")
-        #inserted_id = save_to_mongo    "_id": "64f1a2b3c1b2c3d4e5f6a7b9",db(data)
         print(f"Datos insertados correctamente con ID: {inserted_id}")
-        data.id = inserted_id
-        print("data",data)
-        print(data.id)
+        #data.id = inserted_id
         return {
             "status": 200,
             "message": "Datos insertados correctamente",
+            "id": inserted_id
         }
     except Exception as e:
         return JSONResponse(status_code=500, content={"detail": str(e)})

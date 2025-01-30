@@ -2,7 +2,7 @@ from datetime import date, datetime
 from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
-from typing import Dict
+from typing import Dict, List
 
 
 # Configura la conexión con MongoDB
@@ -50,7 +50,6 @@ class MongoConnection:
 
             # Insertar el documento en MongoDB
             result = self.db[collection_name].insert_one(data_dict)
-            
             # Convertir ObjectId a string si es necesario
             data_dict["_id"] = str(result.inserted_id)
             
@@ -125,3 +124,44 @@ class MongoConnection:
         except Exception as e:
             print(f"Error al obtener la información personal: {e}")
             raise
+    def get_extracted_fields_without_personal_info(self) -> List[Dict]:
+        try:
+            # Obtener todos los documentos excluyendo el campo 'personal_info'
+            documents = self.collection.find({}, {"personal_info": 0})
+            result = []
+            for document in documents:
+                document["_id"] = str(document["_id"])  # Convertir ObjectId a string
+                result.append(document)
+            
+            return result
+        except Exception as e:
+            print(f"Error al obtener los campos extraídos sin la información personal: {e}")
+            raise
+    
+    def update_candidate(self, candidate_id: str, data: Dict):
+        try:
+             # Convertir el ID de string a ObjectId
+            object_id = ObjectId(candidate_id)
+            print(f"Updating candidate with id {object_id} in database")
+            
+            # Crear una copia del diccionario data para no modificar el original
+            data_copy = data.copy()
+
+            # Eliminar el _id del diccionario
+            if "_id" in data_copy:
+                del data_copy["_id"]
+
+
+            # Actualizar el documento en MongoDB
+            result = self.collection.update_one(
+                {"_id": object_id},
+                {"$set": data_copy}  # Usar la copia sin _id
+            )
+            print(f"Candidato actualizado: {result.modified_count} documentos modificados")
+            return result.modified_count
+        except Exception as e:
+            print(f"Error al actualizar el candidato con ID {candidate_id} en MongoDB: {e}")
+            raise
+    
+    
+    

@@ -9,7 +9,7 @@ from app.services.Extract_pdfs import extract_pdf
 from data.database.mongodb import MongoConnection
 from typing import List
 from fastapi.responses import JSONResponse
-from app.models.personal_map_mongos import ProfileModelFromPersonalMap, Seccion, Subseccion, Value, PersonalInfo, Familiar
+from app.models.personal_map_mongos import ProfileModel, ProfileModelFromPersonalMap, Seccion, Subseccion, Value, PersonalInfo, Familiar
 
 PDF_STORAGE_DIR = r"C:\Users\salas\back_recomendation_banco\data\pdfs"
 
@@ -408,3 +408,27 @@ async def extract_and_save_multiple_pdfs(files: List[UploadFile] = File(...)):
         content={"message": "Processing completed.", "results": processed_data_serialized},
         status_code=200
     )
+
+@router.post("/profile/save")
+async def save_profile(data: ProfileModel):
+    connection = MongoConnection()
+    try:
+        # Convertir a un formato serializable
+        data_serialized = jsonable_encoder(data)
+
+        # Guardar en MongoDB
+        inserted_id = connection.save_to_mongodb_ideal_personal_map(data_serialized, "extracted_fields")
+
+        print(f"Datos insertados correctamente con ID: {inserted_id}")
+        #data.id = inserted_id
+        return {
+            "status": 200,
+            "message": "Datos insertados correctamente",
+            "id": inserted_id
+        }
+    except Exception as e:
+        return JSONResponse(
+            content={"detail": str(e)},
+            status_code=500
+        )
+    

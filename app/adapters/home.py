@@ -22,11 +22,11 @@ async def get_personal_maps():
         raise HTTPException(status_code=500, detail=str(e))
     
 
-@router.get("/personal_map/completos/get", response_model=List[ProfileData])
+@router.get("/personal_map/completos/get")
 async def get_profile_data():
     try:
-        db = MySqlConnection()
-        profile_data = db.get_all_personal_maps()
+        db = MongoConnection()
+        profile_data = db.get_extracted_fields_without_personal_info()
         return profile_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

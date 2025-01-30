@@ -82,6 +82,7 @@ class ProfileModel(BaseModel):
     )
     Secciones: List[Seccion]
     Tag: Optional[str] = None
+    id: Optional[str] = None
     #personal_info: Optional[PersonalInfo] = None
 
     @classmethod

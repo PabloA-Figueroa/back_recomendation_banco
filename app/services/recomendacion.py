@@ -52,10 +52,10 @@ def assign_weights_to_candidate(ideal_profile: Dict, candidate: Dict) -> Dict:
             "nombre_seccion": "X/10" (X = suma de ponderaciones en la sección)
             
             Ejemplo de resumen:
-            "resumen_comparativo": {
+            "resumen_comparativo": {{
                 "Habilidades Técnicas": "5/10",
                 "Experiencia Laboral": "7/10"
-            }
+            }}
             """)
         ]
     )

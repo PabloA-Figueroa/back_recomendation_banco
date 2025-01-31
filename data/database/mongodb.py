@@ -123,9 +123,13 @@ class MongoConnection:
             for document in personal_info_cursor:
                 personal_info = document.get("personal_info", {})
                 personal_info["_id"] = str(document["_id"])  # Convertir ObjectId a string si es necesario
-                result.append(personal_info)
-            
-            print("Personal Info: ", result)
+                tag = document.get("Tag", [])  # Obtener el campo 'Tag'
+                result.append({
+                    "personal_info": personal_info,
+                    "Tag": tag
+                })
+
+            print("Personal Info y Tags: ", result)
             return result
         except Exception as e:
             print(f"Error al obtener la información personal: {e}")

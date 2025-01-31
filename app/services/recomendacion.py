@@ -34,18 +34,29 @@ def assign_weights_to_candidate(ideal_profile: Dict, candidate: Dict) -> Dict:
         [
             ("system", """
             Eres un experto en recursos humanos y debes asignar pesos a las características de un candidato en función de un perfil ideal.
-            Debes comparar las características del candidato con el perfil ideal y asignar un peso a cada característica y subcaracteristica del candidato.
+            Debes comparar las características del candidato con el perfil ideal y asignar un peso a cada característica y subcaracterística del candidato.
             {format_instructions}
-            Debes devolver con el mismo formato de entrada (JSON), pero con los pesos asignados a las características del candidato en base a el perfil ideal.            
-            Ademas ten en cuenta que algunos candidatos pueden tener ya haber pasado por este proceso y cuentan con un peso asignado a sus características y explicacion (En ese caso no cambies los datos que uya estan).
-             """),
+            Debes devolver con el mismo formato de entrada (JSON), pero con los pesos asignados y nuevos campos adicionales.            
+            Conserva los datos existentes que ya tengan ponderaciones asignadas.
+            """),
             ("user", """
             Perfil ideal: {ideal_profile}
             Candidato: {candidate}
-            Asigna pesos a las características y subcaracteristicas del candidato en función del perfil ideal.
-            Ademas de las ponderaciones, la explicación de por qué se asignó cada peso es importante y deberia ir al final de la respuesta en un campo llamado "explicacion".
-            Ademas Agrega un tag con el nombre del tag del perfil ideal. (Si el candidato ya tiene un tag agrega otro con el nombre del tag del perfil ideal)
-             """),
+            
+            Instrucciones:
+            1. Asignar pesos a características y subcaracterísticas basado en el perfil ideal
+            2. Mantener ponderaciones existentes si ya existen
+            3. Agregar tag del perfil ideal (si ya tiene tags, agregar uno nuevo)
+            4. Incluir explicación detallada en el campo "explicacion"
+            5. Crear campo "resumen_comparativo" con formato:
+            "nombre_seccion": "X/10" (X = suma de ponderaciones en la sección)
+            
+            Ejemplo de resumen:
+            "resumen_comparativo": {
+                "Habilidades Técnicas": "5/10",
+                "Experiencia Laboral": "7/10"
+            }
+            """)
         ]
     )
     print("Prompt template created")

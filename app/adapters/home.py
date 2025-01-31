@@ -21,6 +21,20 @@ async def get_personal_maps():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@router.get("/profile/get/{id}")
+async def get_personal_info(id: str):
+    mongo_conn = MongoConnection()
+    personal_info = mongo_conn.get_personal_info_by_id(id)
+    if personal_info:
+        return {
+            "status": 200,
+            "data": personal_info
+        }
+    else:
+        return {
+            "status": 404,
+            "message": "Personal info not found"
+        }
 
 @router.get("/personal_map/completos/get")
 async def get_profile_data():

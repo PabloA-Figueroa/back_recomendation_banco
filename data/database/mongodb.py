@@ -2,7 +2,7 @@ from datetime import date, datetime
 from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.errors import ServerSelectionTimeoutError
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 # Configura la conexión con MongoDB
@@ -111,19 +111,46 @@ class MongoConnection:
         except Exception as e:
             print(f"Error al obtener la información personal: {e}")
             raise
+        
     def get_all_personal_info(self):
         try:
-            # Obtener todos los documentos de la colección "extracted_fields"
-            personal_info_cursor = self.db["extracted_fields"].find({}, {"_id": 0, "personal_info": 1})
+            # Excluir únicamente el campo 'personal_info.familiares' sin incluir todo 'personal_info'
+            personal_info_cursor = self.db["extracted_fields"].find({}, {
+                "personal_info.familiares": 0
+            })
             
-            # Convertir el cursor a una lista de documentos
-            personal_info_list = list(personal_info_cursor)
+            result = []
+            for document in personal_info_cursor:
+                personal_info = document.get("personal_info", {})
+                personal_info["_id"] = str(document["_id"])  # Convertir ObjectId a string si es necesario
+                result.append(personal_info)
             
-            print("Personal Info: ", personal_info_list)
-            return personal_info_list
+            print("Personal Info: ", result)
+            return result
         except Exception as e:
             print(f"Error al obtener la información personal: {e}")
             raise
+
+    def get_personal_info_by_id(self, id_str: str):
+        try:
+            object_id = ObjectId(id_str)
+            document = self.db["extracted_fields"].find_one(
+                {"_id": object_id},
+                {
+                    "personal_info.familiares": 0
+                }
+            )
+            
+            if document:
+                document["_id"] = str(document["_id"])  
+                return document
+            
+            print(f"No se encontró información personal para el ID: {id_str}")
+            return None
+        except Exception as e:
+            print(f"Error al obtener la información personal por ID '{id_str}': {e}")
+            raise
+
     def get_extracted_fields_without_personal_info(self) -> List[Dict]:
         try:
             # Obtener todos los documentos excluyendo el campo 'personal_info'
@@ -162,6 +189,4 @@ class MongoConnection:
         except Exception as e:
             print(f"Error al actualizar el candidato con ID {candidate_id} en MongoDB: {e}")
             raise
-    
-    
     

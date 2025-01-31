@@ -130,7 +130,7 @@ class MongoConnection:
                 })
 
             print("Personal Info y Tags: ", result)
-            return result
+            return result   
         except Exception as e:
             print(f"Error al obtener la información personal: {e}")
             raise
